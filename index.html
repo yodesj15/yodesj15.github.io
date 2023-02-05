@@ -1,0 +1,147 @@
+<!-- Atelier 1 
+Veille technologique 02
+Yoan Desjardins -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier 1</title>
+</head>
+
+<body>
+    <div id="graphContainer" style="margin:auto;">
+    </div>
+
+    <script defer>
+        const svgns = "http://www.w3.org/2000/svg";
+        let viewPortMaxUnitX = 650;
+        let viewPortMaxUnitY = 300;
+        let viewport = null;
+        init_UI();
+        function init_UI() {
+            insertViewPort("graphContainer");
+            diagram();
+        }
+        function insertViewPort(containerId) {
+            viewport = document.createElementNS(svgns, "svg");
+            viewport.setAttribute("id", "viewport");
+            viewport.setAttribute("viewBox", "-110 -50 " + viewPortMaxUnitX + " " + viewPortMaxUnitY);
+            document.getElementById(containerId).appendChild(viewport);
+        }
+        //Afficage du diagram complet 
+        function diagram() {
+            let mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+            let ventes = [6500, 5550, 4200, 4525, 2500, 1500, 500, 1000, 1750, 2300, 3700, 3500];
+            let color = "";
+            let xLines = 100;
+            let maxWidht = 0;
+
+            //Titre
+            viewport.appendChild(text(159, -10, "Ventes 2022", 0, 1));
+
+            // Unités 0 $
+            h = 200;
+            viewport.appendChild(line(90, h, 330, h, "black", 0.5));
+            viewport.appendChild(text(80, h + 1.5, "$ 0", 0, 0.35));
+
+            littleLines(h);
+
+            for (let i = 1; i < 8; i++) {
+                h -= 28.5;
+                //Affichage du reste des unités
+                viewport.appendChild(line(90, h, 330, h, "black", 0.5));
+                viewport.appendChild(text(73, h + 1.5, "$ " + i + "000", 0, 0.35));
+                if (i != 7) {
+                    littleLines(h);
+                }
+            }
+
+            //Affichage du diagram restant
+            let l = 0;
+            for (let sale of ventes) {
+                color = validColor(sale);
+                height = returnCorrectHeightBar(sale);
+                if (l == 0) {
+                    viewport.appendChild(line(xLines, height, xLines, 200, color, 15));
+                }
+                else {
+                    xLines = xLines + 20;
+                    if (sale == 3500) {
+                        maxWidht = xLines;
+                    }
+                    viewport.appendChild(line(xLines, height, xLines, 200, color, 15));
+                }
+                viewport.appendChild(text(xLines - 6.5, height - 2, sale + "$", 0, 0.35));
+                viewport.appendChild(text(xLines, 210, mois[l], 60, 0.7));
+                l++;
+            }
+        }
+
+        //Affichage des petites lignes d'unité
+        function littleLines(height) {
+            for (let i = 1; i < 10; i++) {
+                d = height - i * 2.8;
+                viewport.appendChild(line(90, d, 330, d, "black", 0.2));
+            }
+        }
+
+        //Retourne la couleur correspondant aux nombres de vente
+        function validColor(nbSales) {
+            let color = "";
+            if (nbSales < 1500) {
+                color = "red";
+            }
+            else if (nbSales < 3000) {
+                color = "orange";
+            }
+            else if (nbSales < 4500) {
+                color = "yellow";
+            }
+            else {
+                color = "green";
+            }
+            return color;
+        }
+
+        //Retourne l'hauteur correspondant aux nombres de vente
+        function returnCorrectHeightBar(nbSales) {
+            const maxSale = 7000;
+            const heightBar = 200;
+            return 200 - ((heightBar * nbSales) / maxSale);
+        }
+
+        function line(x1, y1, x2, y2, stroke = "black", strokeWidth = 1) {
+            let line = document.createElementNS(svgns, "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("stroke", stroke);
+            line.setAttribute("stroke-width", strokeWidth);
+
+            return line;
+        }
+
+        function rect(x, y, width, height, fill = "white", stroke = "black", strokeWidth = 1) {
+            let rect = document.createElementNS(svgns, "rect");
+            rect.setAttribute("x", x); rect.setAttribute("y", y);
+            rect.setAttribute("width", width); rect.setAttribute("height", height);
+            rect.setAttribute("fill", fill); rect.setAttribute("stroke", stroke);
+            rect.setAttribute("stroke-width", strokeWidth);
+            return rect;
+        }
+
+        function text(x, y, content, angle = 0, size = "1", fill = "black") {
+            let text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x); text.setAttribute("y", y);
+            text.setAttribute("transform", `rotate(${angle},${x},${y})`);
+            text.setAttribute("font-size", size + "em");
+            text.setAttribute("fill", fill);
+            text.innerHTML = content;
+            return text;
+        }
+    </script>
+</body>
+
+</html>
